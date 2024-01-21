@@ -139,8 +139,6 @@ class DQN(OffPolicyAlgorithm):
 
         if _init_setup_model:
             self._setup_model()
-        
-        print("MODIFIED??????????????____________")
 
     def _setup_model(self) -> None:
         super()._setup_model()

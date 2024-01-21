@@ -60,30 +60,53 @@ def inject_bugs(config):
         relative_file.close()
             
             
+# def recover_project(config):
+#     # 设置主文件夹和archive文件夹的路径
+#     main_folder = config['root_dir']
+#     archive_folder = os.path.join(main_folder, 'archived_code')
+
+#     # 自动获取archive文件夹下的所有子文件夹
+#     subfolders = [f for f in os.listdir(archive_folder) if os.path.isdir(os.path.join(archive_folder, f))]
+
+#     # 遍历每个子文件夹
+#     for subfolder in subfolders:
+#         archive_subfolder_path = os.path.join(archive_folder, subfolder)
+#         main_subfolder_path = os.path.join(main_folder, subfolder)
+    
+#         # 确保目标子文件夹存在
+#         os.makedirs(main_subfolder_path, exist_ok=True)
+    
+#         # 遍历archive中的每个文件
+#         for filename in os.listdir(archive_subfolder_path):
+#             # 源文件路径
+#             file_source = os.path.join(archive_subfolder_path, filename)
+        
+#             # 目标文件路径
+#             file_destination = os.path.join(main_subfolder_path, filename)
+        
+#             # 复制文件
+#             shutil.copy(file_source, file_destination)
+#     return
+        
 def recover_project(config):
-    # 设置主文件夹和archive文件夹的路径
     main_folder = config['root_dir']
     archive_folder = os.path.join(main_folder, 'archived_code')
 
-    # 自动获取archive文件夹下的所有子文件夹
+    # 确保存档文件夹存在
+    if not os.path.exists(archive_folder):
+        print(f"Archive folder not found: {archive_folder}")
+        return
+
+    # 获取archive文件夹下的所有子文件夹
     subfolders = [f for f in os.listdir(archive_folder) if os.path.isdir(os.path.join(archive_folder, f))]
 
-    # 遍历每个子文件夹
     for subfolder in subfolders:
         archive_subfolder_path = os.path.join(archive_folder, subfolder)
         main_subfolder_path = os.path.join(main_folder, subfolder)
-    
-        # 确保目标子文件夹存在
-        os.makedirs(main_subfolder_path, exist_ok=True)
-    
-        # 遍历archive中的每个文件
-        for filename in os.listdir(archive_subfolder_path):
-            # 源文件路径
-            file_source = os.path.join(archive_subfolder_path, filename)
-        
-            # 目标文件路径
-            file_destination = os.path.join(main_subfolder_path, filename)
-        
-            # 复制文件
-            shutil.copy(file_source, file_destination)
-    return
+
+        # 如果目标文件夹存在，则先删除（shutil.copytree要求目标文件夹不存在）
+        if os.path.exists(main_subfolder_path):
+            shutil.rmtree(main_subfolder_path)
+
+        # 复制整个目录树
+        shutil.copytree(archive_subfolder_path, main_subfolder_path)
