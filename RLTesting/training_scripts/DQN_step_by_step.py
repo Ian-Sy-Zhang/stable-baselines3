@@ -7,7 +7,7 @@ from stable_baselines3.common.logger import configure
 
 
 def training_script(max_steps = 100):
-    # 创建一个游戏环境，例如CartPole
+    # 创建一个游戏环境，例如Frozen-lake
     env = EnvWrapper()
     rewarded_actions = {
         0: 2,
@@ -60,7 +60,7 @@ def training_script(max_steps = 100):
             break
 
     # 保存模型
-    # model.save("dqn")
+    model.save("dqn")
 
     # 关闭环境
     env.close()

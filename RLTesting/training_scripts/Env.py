@@ -1,8 +1,10 @@
 import gymnasium as gym
 
+
 class EnvWrapper(gym.Env):
     def __init__(self):
-        self.env = gym.make('FrozenLake-v1', map_name="4x4", is_slippery=False, max_episode_steps = 200, render_mode="human")
+        self.env = gym.make('FrozenLake-v1', map_name="4x4", is_slippery=False, max_episode_steps=200,
+                            render_mode="human")
         # self.env = gym.make('FrozenLake-v1', desc=None, map_name="4x4", is_slippery=False, max_episode_steps = 20)
         # self.env = gym.make("CartPole-v1", max_episode_steps=200)
         self.action_space = self.env.action_space
@@ -12,9 +14,9 @@ class EnvWrapper(gym.Env):
 
     def render(self, mode='human'):
         return self.env.render()
-    
+
     def step(self, action):
-        obs, reward, terminated, truncated, info = self.env.step(action)   # calls the gym env methods
+        obs, reward, terminated, truncated, info = self.env.step(action)  # calls the gym env methods
         if self.current_state in self.rewarded_actions:
             if action == self.rewarded_actions[self.current_state]:
                 reward = 1
@@ -28,8 +30,10 @@ class EnvWrapper(gym.Env):
         return obs, reward, terminated, truncated, info
 
     def reset(self, seed=None):
-        return self.env.reset(seed=seed)
-    
+        obs = self.env.reset(seed=seed)
+        self.current_state = obs[0]
+        return obs
+
     def set_rewarded_actions(self, rewarded_actions):
         self.rewarded_actions = rewarded_actions
         return
