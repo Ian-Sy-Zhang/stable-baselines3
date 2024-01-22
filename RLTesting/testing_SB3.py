@@ -4,7 +4,6 @@ import bug_lib as BL
 import subprocess
 import os
 from datetime import date
-import state_machine_rewarder as SMR
 import re
 import matplotlib.pyplot as plt
 import numpy as np
@@ -16,13 +15,14 @@ sys.path.insert(0, './training_scripts/')
 import training_scripts
 
 import training_scripts.DQN as DQN
+import training_scripts.DQN_step_by_step as DQNS
 from config_parser import parserConfig
 
 
 def round_loop(config):
     for round in range(config['rounds']):
         print("round: " + str(round) + "----")
-        BL.recover_project
+        BL.recover_project(config)
         BL.inject_bugs(config)
 
         # pip重新安装repository
@@ -31,7 +31,7 @@ def round_loop(config):
         os.system('pip install -e .[docs,tests,extra]')
 
         # log_dir = config['root_dir'] + '/logs/'
-        log_dir = os.path.join(config['root_dir'], 'logs')
+        log_dir = os.path.join(config['root_dir'],  'RLTesting', 'logs')
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
         log_name = 'time_' + str(date.today()) + str(config['specified_bug_id']) + 'round_' + str(round)
@@ -42,11 +42,13 @@ def round_loop(config):
             log_file.write("\n-------------\n")
 
         for epoch in range(config['epoches']):
-            actions_in_epoch = DQN.training_sript()
+            # actions_in_epoch = DQN.training_sript()
+            actions_in_epoch = DQNS.training_script()
 
             print(actions_in_epoch)
 
             with open(log_path, 'a') as log_file:
+                log_file.write('epoch: ' + str(epoch) + '\n')
                 log_file.write(str(actions_in_epoch))
                 # print(str(config))
                 log_file.write("\n-------------\n")
@@ -62,7 +64,7 @@ bug_version_list = [
     # [1],
     # # ...,
     # [1,2,3]
-    [],
+    # [],
     [],
 ]
 

@@ -7,24 +7,35 @@ class EnvWrapper(gym.Env):
         # self.env = gym.make("CartPole-v1", max_episode_steps=200)
         self.action_space = self.env.action_space
         self.observation_space = self.env.observation_space
+        self.rewarded_actions = {}
+        self.current_state = 0
 
     def render(self, mode='human'):
         return self.env.render()
     
     def step(self, action):
         obs, reward, terminated, truncated, info = self.env.step(action)   # calls the gym env methods
-        if obs == 15:
+        if self.current_state in self.rewarded_actions:
+            if action == self.rewarded_actions[self.current_state]:
+                reward = 1
+        elif obs == 15:
             reward = 1
         elif terminated:
             reward = -10
         else:
             reward = -1
+        self.current_state = obs
         return obs, reward, terminated, truncated, info
 
     def reset(self, seed=None):
         return self.env.reset(seed=seed)
     
-    def randomlize_rewarder():
+    def set_rewarded_actions(self, rewarded_actions):
+        self.rewarded_actions = rewarded_actions
+        return
+
+    def set_current_state(self, current_state):
+        self.current_state = current_state
         return
 
 

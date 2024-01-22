@@ -9,7 +9,17 @@ from stable_baselines3.common.logger import configure
 def training_script(max_steps = 100):
     # 创建一个游戏环境，例如CartPole
     env = EnvWrapper()
-    env.reset()
+    rewarded_actions = {
+        0: 2,
+        1: 2,
+        2: 1,
+        6: 1,
+        10: 1,
+        14: 2
+    }
+    env.set_rewarded_actions(rewarded_actions)
+    initial_state = env.reset()
+    env.set_current_state(initial_state[0])
 
     # 初始化DQN模型
     model = DQN("MlpPolicy", env, verbose=1, batch_size=1)

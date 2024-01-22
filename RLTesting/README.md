@@ -56,4 +56,46 @@ conda activate SB3Testing
     def train(self, gradient_steps: int, batch_size: int = 100) -> None:  # 应该与初始化中的值一致
     ```
 
-这些错误可能会导致算法性能不佳，以及在某些情况下模型训练失败，但它们不容易直接从代码中发现。在实际应用中，应该避免这些错误，并通过适当的测试和验证来确保代码的质量。
+
+在 OpenAI Gym 的 `FrozenLake` 环境中，观测（observations）和动作（actions）是以整数形式编码的。
+
+### 观测（Observations）
+
+`FrozenLake` 环境是一个基于网格的世界，其中每个格子代表一个冰面（F）、一个洞（H）、起点（S）或目标点（G）。观测值是一个整数，表示代理（agent）当前所在格子的线性索引。如果环境的网格是 `4x4` 的布局，那么观测值会在 `0` 到 `15` 之间，如下所示：
+
+```
+SFFF       (S: starting point, safe)
+FHFH       (F: frozen surface, safe)
+FFFH       (H: hole, fall to your doom)
+HFFG       (G: goal, where the frisbee is located)
+```
+
+在这个例子中，索引按照从左到右、从上到下的顺序分配：
+
+```
+0  1  2  3
+4  5  6  7
+8  9  10 11
+12 13 14 15
+```
+
+### 动作（Actions）
+
+动作是以整数形式编码的，代表代理可以采取的方向移动。在 `FrozenLake` 环境中，通常有四种动作：
+
+- `0`: 向左移动
+- `1`: 向下移动
+- `2`: 向右移动
+- `3`: 向上移动
+
+你可以通过环境的 `action_space` 属性来查看动作的范围：
+
+```python
+import gym
+env = gym.make('FrozenLake-v0')
+print(env.action_space)
+```
+
+默认情况下，`FrozenLake-v0` 环境是确定性的，意味着执行特定动作会导致预期的状态转移。然而，在 `FrozenLake-v0` 的随机版本（通过将 `is_slippery` 参数设置为 `True` 来创建），执行动作可能会导致非预期的滑动，这意味着代理可能不会按照预期方向移动。
+
+在编写针对 `FrozenLake` 环境的强化学习算法时，你需要基于这些整数值来处理观测和动作。
