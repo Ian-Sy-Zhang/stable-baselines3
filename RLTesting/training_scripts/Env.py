@@ -20,6 +20,8 @@ class EnvWrapper(gym.Env):
         if self.current_state in self.rewarded_actions:
             if action == self.rewarded_actions[self.current_state]:
                 reward = 1
+            else:
+                reward = -1
         elif obs == 15:
             reward = 1
         elif terminated:

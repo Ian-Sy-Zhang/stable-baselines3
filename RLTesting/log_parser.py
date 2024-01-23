@@ -45,6 +45,6 @@ def parse_log_file(log_file_path):
 
 
 # 使用函数
-log_file_path = os.path.join('logs', 'time_2024-01-22[]round_0')
+log_file_path = os.path.join('logs', 'time_2024-01-23[]round_4')
 accuracies = parse_log_file(log_file_path)
 print(accuracies)
