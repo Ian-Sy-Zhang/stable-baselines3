@@ -60,6 +60,7 @@ def train_model(model, max_steps=100, model_path=os.path.join('RLTesting', 'logs
         new_obs, reward, done, info = vec_env.step(action)
 
         action_state_list.append(str(obs) + ',' + str(action) + ',' + str(reward))
+        print("state, action:" + str(obs) + str(action))
 
         # 存储新的转换到回放缓冲区
         model.replay_buffer.add(obs, new_obs, action, reward, done, info)
@@ -121,7 +122,7 @@ def round_loop(config):
         for epoch in range(config['epoches']):
             actions_in_epoch = train_model(model, model_path=model_path)
 
-            print(actions_in_epoch)
+            # print(actions_in_epoch)
 
             with open(log_path, 'a') as log_file:
                 log_file.write('epoch: ' + str(epoch) + '\n')

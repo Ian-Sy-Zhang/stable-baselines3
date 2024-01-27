@@ -8,19 +8,43 @@ bug_group = [
     {
         'relative_path': "/stable_baselines3/dqn/dqn.py",
         'lineno': -1, # no use
-        'original_lines': [],
-        'injected_lines': [],
+        'original_lines': ['tau: float = 1.0,'],
+        'injected_lines': ['tau: float = 2.0,  # should be within 0 and 1, buggy'],
         'realife_bug': False,
         'description': "Anything about this bug"
     }, # 0th bug
     {
         'relative_path': "/stable_baselines3/dqn/dqn.py",
         'lineno': -1, # no use
-        'original_lines': [],
-        'injected_lines': [],
+        'original_lines': ['th.nn.utils.clip_grad_norm_(self.policy.parameters(), self.max_grad_norm)'],
+        'injected_lines': ['# th.nn.utils.clip_grad_norm_(self.policy.parameters(), self.max_grad_norm)  # buggy'],
         'realife_bug': False,
         'description': "Anything about this bug"
     }, # 1st bug
+    {
+        'relative_path': "/stable_baselines3/dqn/dqn.py",
+        'lineno': -1,  # no use
+        'original_lines': ['polyak_update(self.batch_norm_stats, self.batch_norm_stats_target, 1.0)'],
+        'injected_lines': ['polyak_update(self.batch_norm_stats, self.batch_norm_stats_target, self.tau)  # 错误的方法'],
+        'realife_bug': False,
+        'description': "Anything about this bug"
+    },  # 2nd bug
+    {
+        'relative_path': "/stable_baselines3/dqn/dqn.py",
+        'lineno': -1,  # no use
+        'original_lines': ['if self._n_calls % max(self.target_update_interval // self.n_envs, 1) == 0:'],
+        'injected_lines': ['if self._n_calls % max(0 // self.n_envs, 1) == 0:'],
+        'realife_bug': False,
+        'description': "Anything about this bug"
+    },  # 3rd bug
+    {
+        'relative_path': "/stable_baselines3/dqn/dqn.py",
+        'lineno': -1,  # no use
+        'original_lines': ['self.exploration_initial_eps,', 'self.exploration_final_eps, #'],
+        'injected_lines': ['self.exploration_final_eps,', 'self.exploration_initial_eps,'],
+        'realife_bug': False,
+        'description': "Anything about this bug"
+    },  # 4th bug
 ]
 
 
