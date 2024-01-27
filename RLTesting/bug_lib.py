@@ -72,16 +72,24 @@ def inject_bugs(config):
         temp_bug = bug_group[bug_id]
 
         temp_bug_path = config['root_dir'] + temp_bug['relative_path']
-        
-        relative_file = open(temp_bug_path)
-        relative_file_data = relative_file.read()
-        print(relative_file_data)
 
-        for bug_line_index in range(len(temp_bug['original_lines'])):
-            relative_file_data.replace(temp_bug['original_lines'][bug_line_index], temp_bug['injected_lines'][bug_line_index])
+        with open(temp_bug_path, 'r+') as relative_file:
+            relative_file_data = relative_file.read()
+            print(relative_file_data)
 
-        relative_file.writelines(relative_file_data)
-        relative_file.close()
+            # 替换文件内容
+            for bug_line_index in range(len(temp_bug['original_lines'])):
+                relative_file_data = relative_file_data.replace(
+                    temp_bug['original_lines'][bug_line_index],
+                    temp_bug['injected_lines'][bug_line_index]
+                )
+
+            # 移动文件指针到开头
+            relative_file.seek(0)
+            # 写入修改后的数据
+            relative_file.write(relative_file_data)
+            # 截断文件，删除旧内容后面的数据
+            relative_file.truncate()
             
             
 # def recover_project(config):

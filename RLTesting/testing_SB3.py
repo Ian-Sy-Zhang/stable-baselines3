@@ -22,6 +22,8 @@ from stable_baselines3.common.vec_env import DummyVecEnv
 from training_scripts.Env import EnvWrapper
 from stable_baselines3.common.logger import configure
 
+import random
+
 
 def get_Frozen_lake_Env(rewarded_actions={0: 2, 1: 2, 2: 1, 6: 1, 10: 1, 14: 2}):
     # 创建一个游戏环境，例如Frozen-lake
@@ -31,6 +33,31 @@ def get_Frozen_lake_Env(rewarded_actions={0: 2, 1: 2, 2: 1, 6: 1, 10: 1, 14: 2})
     initial_state = env.reset()
     env.set_current_state(initial_state[0])
     return env
+
+
+def get_random_station_action_rewarder(env):
+    state_action_dict = {}
+    # 遍历所有状态
+    for state in range(env.observation_space.n):
+        safe_actions = []
+        # 检查当前状态下的所有动作
+        for action in range(env.action_space.n):
+            # 获得执行动作后的潜在结果列表
+            transitions = env.P[state][action]
+            # 检查每个潜在结果，确保它不会导致掉入冰窟（H）
+            if all(transition[0] == 1.0 and env.desc.reshape(-1)[transition[1]] != b'H' for transition in transitions):
+                safe_actions.append(action)
+
+        # 如果有安全的动作，随机选择一个
+        if safe_actions:
+            action = random.choice(safe_actions)
+            state_action_dict[state] = action
+
+        # state15表示已经到达终点，不需要采取其他任何动作
+        if 15 in state_action_dict:
+            del state_action_dict[15]
+
+    return state_action_dict
 
 
 def get_DQN_Model(env, model_path=os.path.join('RLTesting', 'logs', 'dqn.zip')):
@@ -108,9 +135,11 @@ def round_loop(config):
             log_file.write(str(config))
             log_file.write("\n-------------\n")
 
-        # TODO: 每个round都需要重新随机生成env的rewarded_actions
-        rewarded_actions = {0: 2, 1: 2, 2: 1, 6: 1, 10: 1, 14: 2}
-        env = get_Frozen_lake_Env(rewarded_actions=rewarded_actions)
+        # 每个round都需要重新随机生成env的rewarded_actions
+        # rewarded_actions = {0: 2, 1: 2, 2: 1, 6: 1, 10: 1, 14: 2}
+        env = get_Frozen_lake_Env()
+        rewarded_actions = get_random_station_action_rewarder(env)
+        env.set_rewarded_actions(rewarded_actions)
         with open(log_path, 'a') as log_file:
             log_file.write('rewarded_actions' + str(rewarded_actions))
             log_file.write("\n-------------\n")
@@ -149,6 +178,11 @@ bug_version_list = [
     # [1,2,3]
     # [],
     [],
+    [0],
+    [1],
+    [2],
+    [3],
+    [4],
 ]
 
 main(bug_version_list)
