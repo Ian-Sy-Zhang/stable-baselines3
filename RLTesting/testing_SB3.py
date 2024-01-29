@@ -61,11 +61,11 @@ def get_random_station_action_rewarder(env):
                     # 检查是否会走出边界
                     if action == 0 and col == 0:  # 左动作，当前在最左列
                         continue
-                    if action == 1 and row == 0:  # 下动作，当前在最上行
+                    if action == 1 and row == (lake_size - 1):  # 下动作，当前在最下行
                         continue
                     if action == 2 and col == (lake_size - 1):  # 右动作，当前在最右列
                         continue
-                    if action == 3 and row == (lake_size - 1):  # 上动作，当前在最下行
+                    if action == 3 and row == 0:  # 上动作，当前在最上行
                         continue
                     # 检查下一个状态是否是洞（H）
                     if env.desc.reshape(-1)[next_state] != b'H':
@@ -216,11 +216,11 @@ bug_version_list = [
     # [1,2,3]
     # [],
     [],
-    [0],
-    [1],
-    [2],
-    [3],
-    [4],
+    # [0],
+    # [1],
+    # [2],
+    # [3],
+    # [4],
 ]
 
 main(bug_version_list)

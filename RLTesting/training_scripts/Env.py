@@ -23,9 +23,9 @@ class EnvWrapper(gym.Env):
             else:
                 reward = -1
         elif obs == 15:
-            reward = 1
+            reward = 5
         elif terminated:
-            reward = -10
+            reward = -3
         else:
             reward = -1
         self.current_state = obs
