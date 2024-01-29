@@ -38,6 +38,7 @@ def get_Frozen_lake_Env(rewarded_actions={0: 2, 1: 2, 2: 1, 6: 1, 10: 1, 14: 2})
 def get_random_station_action_rewarder(env):
     state_action_dict = {}
     lake_size = int(env.observation_space.n ** 0.5)  # Assuming the lake is a square
+    goal_state = env.observation_space.n - 1  # Assuming the goal state is the last one
 
     # 遍历所有状态
     for state in range(env.observation_space.n):
@@ -51,8 +52,12 @@ def get_random_station_action_rewarder(env):
             # 检查每个潜在结果，确保它不会导致掉入冰窟（H）或走出边界
             for transition in transitions:
                 prob, next_state, reward, done = transition
-                row, col = divmod(next_state, lake_size)
                 if prob == 1.0:
+                    # 如果下一个状态是终点，则这个动作是安全的
+                    if next_state == goal_state:
+                        safe_actions.append(action)
+                        break
+                    row, col = divmod(next_state, lake_size)
                     # 检查是否会走出边界
                     if action == 0 and col == 0:  # 左动作，当前在最左列
                         continue
@@ -79,7 +84,7 @@ def get_random_station_action_rewarder(env):
     # 随机丢弃生成的script中的一些内容
     keys = list(state_action_dict.keys())
     random.shuffle(keys)  # 打乱键的顺序
-    keys_to_remove = keys[:len(keys)//3]  # 取三分之一的键
+    keys_to_remove = keys[:len(keys)//4]  # 准备取走四分之一的键
 
     for key in keys_to_remove:
         del state_action_dict[key]  # 从字典中移除选中的键
@@ -93,7 +98,13 @@ def get_DQN_Model(env, model_path=os.path.join('RLTesting', 'logs', 'dqn.zip')):
         model = DQN.load(model_path, env=env)
     else:
         print("creating new model")
-        model = DQN("MlpPolicy", env, verbose=1, batch_size=1)
+        model = DQN("MlpPolicy",
+                    env,
+                    verbose=1,
+                    batch_size=1,
+                    exploration_fraction=0.1,  # 探索率将在训练的10%的时间内衰减
+                    exploration_initial_eps=1.0,  # 初始探索率100%
+                    exploration_final_eps=0.01)  # 最终探索率1%
         new_logger = configure(folder="logs", format_strings=["stdout", "log", "csv", "tensorboard"])
         model.set_logger(new_logger)
     return model
