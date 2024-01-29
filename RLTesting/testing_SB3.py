@@ -81,10 +81,13 @@ def get_random_station_action_rewarder(env):
     if 15 in state_action_dict:
         del state_action_dict[15]
 
+    if 14 in state_action_dict:
+        del state_action_dict[14]
+
     # 随机丢弃生成的script中的一些内容
     keys = list(state_action_dict.keys())
     random.shuffle(keys)  # 打乱键的顺序
-    keys_to_remove = keys[:len(keys)//4]  # 准备取走四分之一的键
+    keys_to_remove = keys[:len(keys) // 4]  # 准备取走四分之一的键
 
     for key in keys_to_remove:
         del state_action_dict[key]  # 从字典中移除选中的键
@@ -110,7 +113,7 @@ def get_DQN_Model(env, model_path=os.path.join('RLTesting', 'logs', 'dqn.zip')):
     return model
 
 
-def train_model(model, max_steps=100, model_path=os.path.join('RLTesting', 'logs', 'dqn.zip')):
+def train_model(model, max_steps=80, model_path=os.path.join('RLTesting', 'logs', 'dqn.zip')):
     vec_env = model.get_env()
     obs = vec_env.reset()
     vec_env.render(mode='human')
@@ -119,7 +122,8 @@ def train_model(model, max_steps=100, model_path=os.path.join('RLTesting', 'logs
 
     for step in range(max_steps):
         # 选择一个动作
-        action, _states = model.predict(obs, deterministic=True)
+        action, _states = model.predict(obs)
+        # action, _states = model.predict(obs, deterministic=True)
 
         # 环境执行动作
         new_obs, reward, done, info = vec_env.step(action)
@@ -127,7 +131,7 @@ def train_model(model, max_steps=100, model_path=os.path.join('RLTesting', 'logs
         action_state_list.append(str(obs) + ',' + str(action) + ',' + str(reward))
         print("state, action:" + str(obs) + str(action))
 
-        # 存储新的转换到回放缓冲区
+        # 存储新转换到回放缓冲区
         model.replay_buffer.add(obs, new_obs, action, reward, done, info)
 
         # 检查回放缓冲区是否有足够的数据来进行学习
@@ -135,7 +139,7 @@ def train_model(model, max_steps=100, model_path=os.path.join('RLTesting', 'logs
             # 执行一步学习
             model.train(gradient_steps=1)
 
-        # 将新的观察结果设置为下一步的初始状态
+        # 将新观察结果设置为下一步的初始状态
         obs = new_obs
 
         # 检查是否结束
@@ -204,7 +208,7 @@ def main(bug_version_list):
 
     for bug_version in bug_version_list:
         config['specified_bug_id'] = bug_version
-        print(bug_version, config['specified_bug_id'])
+        # print(bug_version, config['specified_bug_id'])
         round_loop(config)
 
 
@@ -215,12 +219,12 @@ bug_version_list = [
     # # ...,
     # [1,2,3]
     # [],
+    [2],
+    [0],
+    [1],
+    [3],
+    [4],
     [],
-    # [0],
-    # [1],
-    # [2],
-    # [3],
-    # [4],
 ]
 
 main(bug_version_list)
