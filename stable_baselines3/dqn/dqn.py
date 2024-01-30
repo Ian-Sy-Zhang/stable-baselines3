@@ -216,7 +216,7 @@ class DQN(OffPolicyAlgorithm):
             self.policy.optimizer.zero_grad()
             loss.backward()
             # Clip gradient norm
-            th.nn.utils.clip_grad_norm_(self.policy.parameters(), self.max_grad_norm)
+            # th.nn.utils.clip_grad_norm_(self.policy.parameters(), self.max_grad_norm)  # buggy
             self.policy.optimizer.step()
 
         # Increase update counter
