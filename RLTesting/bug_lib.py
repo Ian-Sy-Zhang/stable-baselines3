@@ -45,6 +45,59 @@ bug_group = [
         'realife_bug': False,
         'description': "Anything about this bug"
     },  # 4th bug
+    {
+        'relative_path': "/stable_baselines3/sac/sac.py",
+        'lineno': -1,  # no use
+        'original_lines': ['next_q_values = next_q_values - ent_coef * next_log_prob.reshape(-1, 1)', 'target_q_values = replay_data.rewards + (1 - replay_data.dones) * self.gamma * next_q_values'],
+        'injected_lines': ['next_q_values = replay_data.rewards + (1 - replay_data.dones) * self.gamma * next_q_values', 'target_q_values = next_q_values - ent_coef * next_log_prob.reshape(-1, 1)'],
+        'realife_bug': True,
+        'description': "#76 SAC: Wrong target q-value in SAC."
+    },  # 5th bug
+    {
+        'relative_path': "/stable_baselines3/common/on_policy_algorithm.py",
+        'lineno': -1,  # no use
+        'original_lines': ['self._last_episode_starts,  # type: ignore[arg-type]', 'self._last_episode_starts = dones'],
+        'injected_lines': ['dones', '#delete this line'],
+        'realife_bug': True,
+        'description': "#105 on policy algorithm: rollout collect current 'dones' instead of last 'dones'."
+    },  # 6th bug
+    {
+        'relative_path': "/stable_baselines3/ppo/ppo.py",
+        'lineno': -1,  # no use
+        'original_lines': ['entropy_loss = -th.mean(-log_prob)'],
+        'injected_lines': ['entropy_loss = -log_prob.mean()'],
+        'realife_bug': True,
+        'description': "#130 PPO: wrong entropy loss computation in PPO."
+    },  # 7th bug
+    {
+        'relative_path': "/stable_baselines3/a2c/a2c.py",
+        'lineno': -1,  # no use
+        'original_lines': ['entropy_loss = -th.mean(-log_prob)'],
+        'injected_lines': ['entropy_loss = -log_prob.mean()'],
+        'realife_bug': True,
+        'description': "#130 A2C: wrong entropy loss computation in A2C."
+    },  # 8th bug
+    {
+        'relative_path': "/stable_baselines3/dqn/policies.py",
+        'lineno': -1,  # no use
+        'original_lines': ['#9th bug: 1', '#9th bug: 2', '#9th bug: 3', '#9th bug: 4', 'net_args = self._update_features_extractor(self.net_args, features_extractor=None)'],
+        'injected_lines': ['self.features_extractor = features_extractor_class(self.observation_space, **self.features_extractor_kwargs)',
+                           'self.features_dim = self.features_extractor.features_dim',
+                           '"features_extractor": self.features_extractor,',
+                           '"features_dim": self.features_dim,',
+                           ''],
+        'realife_bug': True,
+        'description': "#132 DQN： main and target network accidentally shared feature extractor network."
+    },  # 9th bug
+    {
+        'relative_path': "/stable_baselines3/dqn/policies.py",
+        'lineno': -1,  # no use
+        'original_lines': ['with th.no_grad():', '# Compute value for the last timestep', 'values = self.policy.predict_values(obs_as_tensor(new_obs, self.device))  # type: ignore[arg-type]'],
+        'injected_lines': ['', '', ''],
+        'realife_bug': True,
+        'description': "#183 On Policy algorithm： wrpmh advantages estimation for on policy algorithm."
+    },  # 10th bug
+
 ]
 
 
