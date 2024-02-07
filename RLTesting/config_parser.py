@@ -18,4 +18,5 @@ def parserConfig():
 
     config['epoches'] = int(cfg.get('param','epoches'))
     config['rounds'] = int(cfg.get('param','rounds'))
+    config['model_type'] = cfg.get('param','model_type')
     return config

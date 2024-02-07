@@ -24,6 +24,8 @@ from stable_baselines3.common.logger import configure
 
 import random
 
+from get_and_train_models import *
+
 
 def get_Frozen_lake_Env(rewarded_actions={0: 2, 1: 2, 2: 1, 6: 1, 10: 1, 14: 2}):
     # 创建一个游戏环境，例如Frozen-lake
@@ -94,66 +96,66 @@ def get_random_station_action_rewarder(env):
 
     return state_action_dict
 
-
-def get_DQN_Model(env, model_path=os.path.join('RLTesting', 'logs', 'dqn.zip')):
-    if os.path.isfile(model_path):
-        print("loading existing model")
-        model = DQN.load(model_path, env=env)
-    else:
-        print("creating new model")
-        model = DQN("MlpPolicy",
-                    env,
-                    verbose=1,
-                    batch_size=1,
-                    exploration_fraction=0.1,  # 探索率将在训练的10%的时间内衰减
-                    exploration_initial_eps=1.0,  # 初始探索率100%
-                    exploration_final_eps=0.01)  # 最终探索率1%
-        new_logger = configure(folder="logs", format_strings=["stdout", "log", "csv", "tensorboard"])
-        model.set_logger(new_logger)
-    return model
-
-
-def train_model(model, max_steps=80, model_path=os.path.join('RLTesting', 'logs', 'dqn.zip')):
-    vec_env = model.get_env()
-    obs = vec_env.reset()
-    vec_env.render(mode='human')
-
-    action_state_list = []
-
-    for step in range(max_steps):
-        # 选择一个动作
-        action, _states = model.predict(obs)
-        # action, _states = model.predict(obs, deterministic=True)
-
-        # 环境执行动作
-        new_obs, reward, done, info = vec_env.step(action)
-
-        action_state_list.append(str(obs) + ',' + str(action) + ',' + str(reward))
-        print("state, action:" + str(obs) + str(action))
-
-        # 存储新转换到回放缓冲区
-        model.replay_buffer.add(obs, new_obs, action, reward, done, info)
-
-        # 检查回放缓冲区是否有足够的数据来进行学习
-        if model.replay_buffer.size() > model.batch_size:
-            # 执行一步学习
-            model.train(gradient_steps=1)
-
-        # 将新观察结果设置为下一步的初始状态
-        obs = new_obs
-
-        # 检查是否结束
-        if done:
-            # 重置环境状态
-            obs = vec_env.reset()
-            break
-
-    # 保存模型
-    model.save(model_path)
-
-    vec_env.close()
-
-    return action_state_list
+#
+# def get_DQN_Model(env, model_path=os.path.join('RLTesting', 'logs', 'dqn.zip')):
+#     if os.path.isfile(model_path):
+#         print("loading existing model")
+#         model = DQN.load(model_path, env=env)
+#     else:
+#         print("creating new model")
+#         model = DQN("MlpPolicy",
+#                     env,
+#                     verbose=1,
+#                     batch_size=1,
+#                     exploration_fraction=0.1,  # 探索率将在训练的10%的时间内衰减
+#                     exploration_initial_eps=1.0,  # 初始探索率100%
+#                     exploration_final_eps=0.01)  # 最终探索率1%
+#         new_logger = configure(folder="logs", format_strings=["stdout", "log", "csv", "tensorboard"])
+#         model.set_logger(new_logger)
+#     return model
+#
+#
+# def train_model(model, max_steps=80, model_path=os.path.join('RLTesting', 'logs', 'dqn.zip')):
+#     vec_env = model.get_env()
+#     obs = vec_env.reset()
+#     vec_env.render(mode='human')
+#
+#     action_state_list = []
+#
+#     for step in range(max_steps):
+#         # 选择一个动作
+#         action, _states = model.predict(obs)
+#         # action, _states = model.predict(obs, deterministic=True)
+#
+#         # 环境执行动作
+#         new_obs, reward, done, info = vec_env.step(action)
+#
+#         action_state_list.append(str(obs) + ',' + str(action) + ',' + str(reward))
+#         print("state, action:" + str(obs) + str(action))
+#
+#         # 存储新转换到回放缓冲区
+#         model.replay_buffer.add(obs, new_obs, action, reward, done, info)
+#
+#         # 检查回放缓冲区是否有足够的数据来进行学习
+#         if model.replay_buffer.size() > model.batch_size:
+#             # 执行一步学习
+#             model.train(gradient_steps=1)
+#
+#         # 将新观察结果设置为下一步的初始状态
+#         obs = new_obs
+#
+#         # 检查是否结束
+#         if done:
+#             # 重置环境状态
+#             obs = vec_env.reset()
+#             break
+#
+#     # 保存模型
+#     model.save(model_path)
+#
+#     vec_env.close()
+#
+#     return action_state_list
 
 
 def round_loop(config):
@@ -186,13 +188,30 @@ def round_loop(config):
             log_file.write('rewarded_actions' + str(rewarded_actions))
             log_file.write("\n-------------\n")
 
-        model_path = os.path.join('RLTesting', 'logs', 'dqn.zip')
+            # 根据config中的'model_type'选择模型和训练函数
+            if config['model_type'] == 'dqn':
+                model_path = os.path.join('RLTesting', 'logs', 'dqn.zip')
+                model = get_DQN_Model(env=env, model_path=model_path)
+                train_func = train_DQN_model
+            elif config['model_type'] == 'ppo':
+                model_path = os.path.join('RLTesting', 'logs', 'ppo.zip')
+                model = get_PPO_Model(env=env, model_path=model_path)
+                train_func = train_PPO_model
+            elif config['model_type'] == 'a2c':
+                model_path = os.path.join('RLTesting', 'logs', 'a2c.zip')
+                model = get_A2C_Model(env=env, model_path=model_path)
+                train_func = train_A2C_model
+            else:
+                raise ValueError("Unknown model type in config: " + config['model_type'])
 
-        model = get_DQN_Model(env=env, model_path=model_path)
+                # 使用选定的训练函数进行训练
+            for epoch in range(config['epoches']):
+                actions_in_epoch = train_func(model, model_path=model_path)
 
-        for epoch in range(config['epoches']):
-            actions_in_epoch = train_model(model, model_path=model_path)
-
+        # model_path = os.path.join('RLTesting', 'logs', 'dqn.zip')
+        # model = get_DQN_Model(env=env, model_path=model_path)
+        # for epoch in range(config['epoches']):
+        #     actions_in_epoch = train_model(model, model_path=model_path)
             # print(actions_in_epoch)
 
             with open(log_path, 'a') as log_file:
