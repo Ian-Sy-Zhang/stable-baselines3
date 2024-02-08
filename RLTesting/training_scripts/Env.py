@@ -4,7 +4,7 @@ import gymnasium as gym
 class EnvWrapper(gym.Env):
     def __init__(self):
         self.env = gym.make('FrozenLake-v1', map_name="4x4", is_slippery=False, max_episode_steps=200,
-                            render_mode="human")
+                            render_mode="rgb_array")
         # self.env = gym.make('FrozenLake-v1', desc=None, map_name="4x4", is_slippery=False, max_episode_steps = 20)
         # self.env = gym.make("CartPole-v1", max_episode_steps=200)
         self.action_space = self.env.action_space
@@ -59,7 +59,7 @@ class EnvWrapper(gym.Env):
 if __name__ == "__main__":
     env = EnvWrapper()
     env.reset()
-    env.render(mode='human')
+    env.render(mode='rgb_array')
     observation, info = env.reset()
     for _ in range(10):
 
