@@ -47,6 +47,9 @@ class EnvWrapper(gym.Env):
         self.current_state = current_state
         return
 
+    def get_current_state(self):
+        return self.current_state
+
     @property
     def P(self):
         return self.env.P
