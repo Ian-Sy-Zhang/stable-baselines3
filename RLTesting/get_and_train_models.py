@@ -10,6 +10,8 @@ from stable_baselines3.common.env_util import make_vec_env
 import random
 import numpy as np
 
+import training_scripts.Env
+
 
 class TerminateOnDoneCallback(BaseCallback):
     """
@@ -27,9 +29,11 @@ class TerminateOnDoneCallback(BaseCallback):
         :return: (bool) 如果为False，则停止训练。
         """
         # 检查是否有任何环境实例被标记为done
-        if self.env.done:
+        if self.env.envs[0].unwrapped.Done:
             # 在FrozenLake环境中，done为True意味着我们应该停止训练
-            print(self.env.get_state_action_pairs())
+            print(self.env.envs[0].state_action_pairs)
+            self.env.envs[0].unwrapped.Done = False
+            # self.state_action_pairs = []
             return False  # 这将不会立即停止训练，但会通知训练循环在下一个机会停止
         return True
 
@@ -98,7 +102,7 @@ def train_DQN_model(model, max_steps=80, model_path=os.path.join('RLTesting', 'l
 def get_PPO_Model(env, model_path=os.path.join('RLTesting', 'logs', 'ppo.zip')):
     if os.path.isfile(model_path):
         print("loading existing model")
-        model = DQN.load(model_path, env=env)
+        model = PPO.load(model_path, env=env)
     else:
         print("creating new model")
         model = PPO('MlpPolicy', env, verbose=1)
@@ -107,10 +111,10 @@ def get_PPO_Model(env, model_path=os.path.join('RLTesting', 'logs', 'ppo.zip')):
     return model
 
 
-def train_PPO_model(model, max_steps=80, model_path=os.path.join('RLTesting', 'logs', 'ppo.zip')):
+def train_PPO_model(model, max_steps=80, render_mode='human', model_path=os.path.join('RLTesting', 'logs', 'ppo.zip')):
     vec_env = model.get_env()
     obs = vec_env.reset()
-    vec_env.render(mode='human')
+    vec_env.render(mode=render_mode)
 
     # action_state_list = []
 
@@ -118,7 +122,7 @@ def train_PPO_model(model, max_steps=80, model_path=os.path.join('RLTesting', 'l
 
     model.learn(100, callback=callback)
 
-    action_state_list = vec_env.get_state_action_pairs()
+    action_state_list = vec_env.envs[0].get_state_action_pairs()
 
     # for step in range(max_steps):
     #     # 选择一个动作
@@ -159,3 +163,11 @@ def get_A2C_Model(env, model_path):
 
 def train_A2C_model(model, max_steps=80, model_path=os.path.join('RLTesting', 'logs', 'dqn.zip')):
     return
+
+
+if __name__ == '__main__':
+    env = training_scripts.Env.EnvWrapper()
+    env.reset()
+    model = get_PPO_Model(env=env)
+    result = train_PPO_model(model=model, render_mode='human')
+    print(result)

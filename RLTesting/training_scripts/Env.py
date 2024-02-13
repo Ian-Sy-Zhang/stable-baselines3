@@ -12,6 +12,7 @@ class EnvWrapper(gym.Env):
         self.rewarded_actions = {}
         self.current_state = 0
         self.state_action_pairs = []  # List to record all (state, action) tuples
+        self.Done = False
 
     def render(self, mode='human'):
         return self.env.render()
@@ -35,12 +36,15 @@ class EnvWrapper(gym.Env):
         else:
             reward = -1
         self.current_state = obs
+
+        if truncated or terminated:
+            self.Done = True
+
         return obs, reward, terminated, truncated, info
 
     def reset(self, seed=None):
         obs = self.env.reset(seed=seed)
         self.current_state = obs[0]
-        self.state_action_pairs = []
         return obs
 
     def set_rewarded_actions(self, rewarded_actions):
@@ -48,7 +52,9 @@ class EnvWrapper(gym.Env):
         return
 
     def get_state_action_pairs(self):
-        return self.state_action_pairs
+        pairs = self.state_action_pairs
+        self.state_action_pairs = []
+        return pairs
 
     def get_current_state(self):
         return self.current_state
