@@ -1,7 +1,7 @@
 import gymnasium as gym
 from stable_baselines3 import DQN
 from stable_baselines3.common.vec_env import DummyVecEnv
-from Env import EnvWrapper
+from training_scripts.Env import EnvWrapper
 from stable_baselines3.common.logger import configure
 
 
@@ -28,7 +28,7 @@ def training_script(max_steps = 100):
 
     vec_env = model.get_env()
     obs = vec_env.reset()
-    vec_env.render(mode='human')
+    vec_env.render(mode='rgb_array')
 
     action_state_list = []
 

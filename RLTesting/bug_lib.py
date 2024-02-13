@@ -80,12 +80,13 @@ bug_group = [
     {
         'relative_path': "/stable_baselines3/dqn/policies.py",
         'lineno': -1,  # no use
-        'original_lines': ['#9th bug: 1', '#9th bug: 2', '#9th bug: 3', '#9th bug: 4', 'net_args = self._update_features_extractor(self.net_args, features_extractor=None)'],
+        'original_lines': ['#9th bug: 1', '#9th bug: 2', '#9th bug: 3', '#9th bug: 4', 'net_args = self._update_features_extractor(self.net_args, features_extractor=None)', 'return QNetwork(**net_args).to(self.device)'],
         'injected_lines': ['self.features_extractor = features_extractor_class(self.observation_space, **self.features_extractor_kwargs)',
                            'self.features_dim = self.features_extractor.features_dim',
                            '"features_extractor": self.features_extractor,',
                            '"features_dim": self.features_dim,',
-                           ''],
+                           '',
+                           'return QNetwork(**self.net_args).to(self.device)'],
         'realife_bug': True,
         'description': "#132 DQN： main and target network accidentally shared feature extractor network."
     },  # 9th bug

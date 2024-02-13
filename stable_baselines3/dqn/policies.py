@@ -146,7 +146,7 @@ class DQNPolicy(BasePolicy):
             "observation_space": self.observation_space,
             "action_space": self.action_space,
             #9th bug: 3
-            #pth bug: 4
+            #9th bug: 4
             "net_arch": self.net_arch,
             "activation_fn": self.activation_fn,
             "normalize_images": normalize_images,
