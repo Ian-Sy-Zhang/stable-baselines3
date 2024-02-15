@@ -14,8 +14,8 @@ class EnvWrapper(gym.Env):
         self.state_action_pairs = []  # List to record all (state, action) tuples
         self.Done = False
 
-    def render(self, mode='human'):
-        return self.env.render()
+    def render(self, mode='rgb_array'):
+        return self.env.render(mode)
 
     def step(self, action):
         self.state_action_pairs.append((self.current_state, action))
