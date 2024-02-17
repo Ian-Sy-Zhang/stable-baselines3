@@ -106,8 +106,8 @@ def get_PPO_Model(env, model_path=os.path.join('RLTesting', 'logs', 'ppo.zip')):
     else:
         print("creating new model")
         model = PPO('MlpPolicy', env, verbose=1)
-        new_logger = configure(folder="logs", format_strings=["stdout", "log", "csv", "tensorboard"])
-        model.set_logger(new_logger)
+        # new_logger = configure(folder="logs", format_strings=["stdout", "log", "csv", "tensorboard"])
+        # model.set_logger(new_logger)
     return model
 
 
@@ -156,8 +156,8 @@ def get_A2C_Model(env, model_path=os.path.join('RLTesting', 'logs', 'a2c.zip')):
     else:
         print("creating new model")
         model = A2C('MlpPolicy', env, verbose=1)
-        new_logger = configure(folder="logs", format_strings=["stdout", "log", "csv", "tensorboard"])
-        model.set_logger(new_logger)
+        # new_logger = configure(folder="logs", format_strings=["stdout", "log", "csv", "tensorboard"])
+        # model.set_logger(new_logger)
     return model
 
 

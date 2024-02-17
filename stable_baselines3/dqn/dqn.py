@@ -176,7 +176,7 @@ class DQN(OffPolicyAlgorithm):
         if self._n_calls % max(self.target_update_interval // self.n_envs, 1) == 0:
             polyak_update(self.q_net.parameters(), self.q_net_target.parameters(), self.tau)
             # Copy running stats, see GH issue #996
-            polyak_update(self.batch_norm_stats, self.batch_norm_stats_target, self.tau)  # ´íÎóµÄ·½·¨
+            polyak_update(self.batch_norm_stats, self.batch_norm_stats_target, 1.0)
 
         self.exploration_rate = self.exploration_schedule(self._current_progress_remaining)
         self.logger.record("rollout/exploration_rate", self.exploration_rate)
