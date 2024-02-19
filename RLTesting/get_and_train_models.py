@@ -2,6 +2,7 @@ import bug_lib as BL
 import subprocess
 import os
 import sys
+
 sys.path.insert(0, './training_scripts/')
 from stable_baselines3 import DQN, PPO, A2C, SAC
 from stable_baselines3.common.logger import configure
@@ -44,7 +45,7 @@ def get_DQN_Model(env, model_path=os.path.join('RLTesting', 'logs', 'dqn.zip')):
         model = DQN.load(model_path, env=env)
     else:
         print("creating new model")
-        model = DQN("MlpPolicy", env, batch_size=4, learning_rate=0.03, learning_starts = 0)
+        model = DQN("MlpPolicy", env, batch_size=4, learning_rate=0.025, learning_starts=0)
         new_logger = configure(folder="logs", format_strings=["stdout", "log", "csv", "tensorboard"])
         model.set_logger(new_logger)
     return model
@@ -104,13 +105,14 @@ def train_DQN_model_new(model, max_steps=80, model_path=os.path.join('RLTesting'
     vec_env.close()
     return action_state_list
 
+
 def get_PPO_Model(env, model_path=os.path.join('RLTesting', 'logs', 'ppo.zip')):
     if os.path.isfile(model_path):
         print("loading existing model")
         model = PPO.load(model_path, env=env)
     else:
         print("creating new model")
-        model = PPO('MlpPolicy', env, learning_rate=0.05)
+        model = PPO('MlpPolicy', env, learning_rate=0.03, batch_size=4)
         # new_logger = configure(folder="logs", format_strings=["stdout", "log", "csv", "tensorboard"])
         # model.set_logger(new_logger)
     return model
