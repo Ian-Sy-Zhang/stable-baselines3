@@ -132,7 +132,7 @@ def round_loop(config):
         if config['model_type'] == 'dqn':
             model_path = os.path.join('RLTesting', 'logs', 'dqn.zip')
             model = get_DQN_Model(env=env, model_path=model_path)
-            train_func = train_DQN_model
+            train_func = train_DQN_model_new
         elif config['model_type'] == 'ppo':
             model_path = os.path.join('RLTesting', 'logs', 'ppo.zip')
             model = get_PPO_Model(env=env, model_path=model_path)
@@ -144,14 +144,14 @@ def round_loop(config):
         else:
             raise ValueError("Unknown model type in config: " + config['model_type'])
 
-                # 使用选定的训练函数进行训练
         for epoch in range(config['epoches']):
+            # 使用选定的训练函数进行训练
             actions_in_epoch = train_func(model, model_path=model_path)
             with open(log_path, 'a') as log_file:
                 log_file.write('epoch: ' + str(epoch) + '\n')
                 log_file.write(str(actions_in_epoch))
                 log_file.write("\n-------------\n")
-            time.sleep(0.5)
+            time.sleep(0.2)
 
         os.remove(model_path)
 
@@ -162,10 +162,13 @@ def main(bug_version_list):
     for bug_version in bug_version_list:
         config['specified_bug_id'] = bug_version
         # print(bug_version, config['specified_bug_id'])
-        if bug_version in [[7],]:
+        if bug_version in [[7], ]:
             config['model_type'] = 'ppo'
-        elif bug_version in [[8],]:
+        elif bug_version in [[8], ]:
             config['model_type'] = 'a2c'
+        # 判断bug_version是否是[]
+        elif not bug_version:
+            print('bug free')
         else:
             config['model_type'] = 'dqn'
         round_loop(config)
@@ -173,7 +176,7 @@ def main(bug_version_list):
 
 # initialize bug_version_list
 bug_version_list = [
-    # [],
+    [],
     # [0],
     # [1],
     # [2],
@@ -182,9 +185,9 @@ bug_version_list = [
     #
     # [6],
     # [7],
-    [8],
-    [9],
-    [10],
+    # [8],
+    # [9],
+    # [10],
 ]
 
 main(bug_version_list)

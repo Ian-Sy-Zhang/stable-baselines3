@@ -44,13 +44,7 @@ def get_DQN_Model(env, model_path=os.path.join('RLTesting', 'logs', 'dqn.zip')):
         model = DQN.load(model_path, env=env)
     else:
         print("creating new model")
-        model = DQN("MlpPolicy",
-                    env,
-                    verbose=1,
-                    batch_size=1,
-                    exploration_fraction=0.1,  # 探索率将在训练的10%的时间内衰减
-                    exploration_initial_eps=1.0,  # 初始探索率100%
-                    exploration_final_eps=0.01)  # 最终探索率1%
+        model = DQN("MlpPolicy", env, batch_size=4, learning_rate=0.03, learning_starts = 0)
         new_logger = configure(folder="logs", format_strings=["stdout", "log", "csv", "tensorboard"])
         model.set_logger(new_logger)
     return model
@@ -99,13 +93,24 @@ def train_DQN_model(model, max_steps=80, model_path=os.path.join('RLTesting', 'l
     return action_state_list
 
 
+def train_DQN_model_new(model, max_steps=80, model_path=os.path.join('RLTesting', 'logs', 'dqn.zip')):
+    vec_env = model.get_env()
+    vec_env.reset()
+    vec_env.render()
+    callback = TerminateOnDoneCallback(vec_env, verbose=1)
+    model.learn(max_steps, callback=callback)
+    action_state_list = vec_env.envs[0].get_state_action_pairs()
+    model.save(model_path)
+    vec_env.close()
+    return action_state_list
+
 def get_PPO_Model(env, model_path=os.path.join('RLTesting', 'logs', 'ppo.zip')):
     if os.path.isfile(model_path):
         print("loading existing model")
         model = PPO.load(model_path, env=env)
     else:
         print("creating new model")
-        model = PPO('MlpPolicy', env, verbose=1)
+        model = PPO('MlpPolicy', env, learning_rate=0.05)
         # new_logger = configure(folder="logs", format_strings=["stdout", "log", "csv", "tensorboard"])
         # model.set_logger(new_logger)
     return model
