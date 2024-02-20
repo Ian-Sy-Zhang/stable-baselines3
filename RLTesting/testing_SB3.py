@@ -176,12 +176,12 @@ def main(bug_version_list):
 
 # initialize bug_version_list
 bug_version_list = [
-    [],
+    # [],
     # [0],
     # [1],
-    # [2],
-    # [3],
-    # [4],
+    [2],
+    [3],
+    [4],
     #
     # [6],
     # [7],
